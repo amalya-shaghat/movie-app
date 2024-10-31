@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MovieRequest;
 use App\Models\Movie;
 use Illuminate\Http\JsonResponse;
 
@@ -14,7 +13,7 @@ class MovieController extends Controller
      */
     public function index(): JsonResponse
     {
-        $movies = Movie::with('genres')->get();
+        $movies = Movie::with('genres')->paginate(10);
 
         return response()->json([
             'success' => true,
@@ -23,31 +22,12 @@ class MovieController extends Controller
     }
 
     /**
-     * @param  MovieRequest  $request
+     * @param $id
      * @return JsonResponse
      */
-    public function store(MovieRequest $request): JsonResponse
+    public function show($id): JsonResponse
     {
-        $movie = Movie::create($request->only('title', 'poster_url', 'is_published'));
-
-        if ($request->has('genres')) {
-            $movie->genres()->attach($request->input('genres'));
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $movie->load('genres'),
-            'message' => 'Movie created successfully.'
-        ], 201);
-    }
-
-    /**
-     * @param  Movie  $movie
-     * @return JsonResponse
-     */
-    public function show(Movie $movie): JsonResponse
-    {
-        $movie->load('genres');
+        $movie = Movie::with('genres')->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -55,36 +35,4 @@ class MovieController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified movie in storage.
-     *
-     * @param  MovieRequest  $request
-     * @param  Movie  $movie
-     * @return JsonResponse
-     */
-    public function update(MovieRequest $request, Movie $movie): JsonResponse
-    {
-        $movie->update($request->validated());
-
-        if ($request->has('genres')) {
-            $movie->genres()->sync($request->input('genres'));
-        }
-
-        return response()->json(['message' => 'Movie updated successfully', 'movie' => $movie], 200);
-    }
-
-    /**
-     * @param  Movie  $movie
-     * @return JsonResponse
-     */
-    public function destroy(Movie $movie): JsonResponse
-    {
-        $movie->genres()->detach();
-        $movie->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Movie deleted successfully.'
-        ]);
-    }
 }
