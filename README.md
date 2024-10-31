@@ -67,6 +67,16 @@ Follow these steps to set up the application locally:
    php artisan serve
    ```
 
+## Storage Setup
+
+To ensure that any uploaded movie posters are accessible via the web, you need to create a symbolic link from the `public/storage` directory to the `storage/app/public` directory. Follow these steps:
+
+1. **Create the Storage Link**
+   Run the following command in your terminal to create the symbolic link:
+   ```bash
+   php artisan storage:link
+    ```
+
 ## API Testing
 
 You can use tools like Postman or cURL to test the API endpoints.
