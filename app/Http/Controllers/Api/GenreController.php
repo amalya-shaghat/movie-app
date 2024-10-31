@@ -13,7 +13,7 @@ class GenreController extends Controller
      */
     public function index(): JsonResponse
     {
-        $genres = Genre::paginate(10);
+        $genres = Genre::with('movies')->paginate(10);
 
         return response()->json([
             'success' => true,
